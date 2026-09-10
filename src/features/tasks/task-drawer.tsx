@@ -239,6 +239,37 @@ export function TaskDrawer({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [composer, isOpen, onClose]);
 
+  // Android Back button: push a history entry when drawer opens,
+  // intercept popstate so Back closes drawer instead of leaving the page.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Push a dummy history entry so Back can be intercepted
+    history.pushState({ drawerOpen: true }, "");
+
+    function handlePopState() {
+      // If composer is open, close it first (one step back)
+      if (composer) {
+        resetComposer();
+        // Re-push so next Back still closes the drawer
+        history.pushState({ drawerOpen: true }, "");
+      } else {
+        onClose();
+      }
+    }
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      // If the drawer closes via another path (not Back), pop the history entry
+      // to keep the history stack clean
+      if (history.state?.drawerOpen) {
+        history.back();
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen) return;
     const previousOverflow = document.body.style.overflow;
