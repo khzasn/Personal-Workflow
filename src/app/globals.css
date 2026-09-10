@@ -1,0 +1,176 @@
+@import "tailwindcss";
+
+/* Dark mode berbasis class */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Mapping CSS variables ke utility Tailwind */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+}
+
+@layer base {
+  :root {
+    --radius: 1rem;
+
+    --background: 250 40% 98%;
+    --foreground: 240 22% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 22% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 22% 12%;
+    --primary: 258 90% 66%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 252 38% 94%;
+    --secondary-foreground: 252 32% 24%;
+    --muted: 248 28% 95%;
+    --muted-foreground: 242 10% 46%;
+    --accent: 160 65% 44%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 78% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 246 24% 90%;
+    --input: 246 24% 90%;
+    --ring: 258 90% 66%;
+  }
+
+  .dark {
+    --background: 240 28% 7%;
+    --foreground: 245 30% 96%;
+    --card: 240 24% 10%;
+    --card-foreground: 245 30% 96%;
+    --popover: 240 24% 10%;
+    --popover-foreground: 245 30% 96%;
+    --primary: 258 92% 72%;
+    --primary-foreground: 240 30% 8%;
+    --secondary: 243 20% 16%;
+    --secondary-foreground: 245 25% 92%;
+    --muted: 243 20% 15%;
+    --muted-foreground: 244 12% 66%;
+    --accent: 160 58% 48%;
+    --accent-foreground: 240 30% 8%;
+    --destructive: 0 68% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 243 18% 19%;
+    --input: 243 18% 19%;
+    --ring: 258 92% 72%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    background-image:
+      radial-gradient(
+        circle at 50% 0%,
+        hsl(var(--primary) / 0.07),
+        transparent 45%
+      );
+    background-attachment: fixed;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(
+        circle at 50% 0%,
+        hsl(var(--primary) / 0.12),
+        transparent 50%
+      );
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  ::selection {
+    color: white;
+    background-color: hsl(var(--primary));
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soft-pulse {
+  0%,
+  100% {
+    opacity: 0.65;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 400ms ease-out both;
+}
+
+.animate-soft-pulse {
+  animation: soft-pulse 2s ease-in-out infinite;
+}
+
+.pretty-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--primary) / 0.28) transparent;
+}
+
+.pretty-scrollbar::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.pretty-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: hsl(var(--primary) / 0.25);
+}
+
+.pretty-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
