@@ -39,6 +39,7 @@ interface TaskDrawerProps {
   onClose: () => void;
   selectedDate: string | null;
   tasks: Task[];
+  addOptimisticTask?: (task: Task) => void;
   onPreviousDay: () => void;
   onNextDay: () => void;
   initialStartTime?: string | null;
@@ -133,6 +134,7 @@ export function TaskDrawer({
   onClose,
   selectedDate,
   tasks,
+  addOptimisticTask,
   onPreviousDay,
   onNextDay,
   initialStartTime,
@@ -340,46 +342,70 @@ export function TaskDrawer({
 
     setIsCreating(true);
     setErrorMsg(null);
+    
+    const formData = new FormData(event.currentTarget);
 
-    if (recurrence.frequency !== "none") {
-      const startTimeVal =
-        composer.kind === "timed" ? toTimeValue(composer.startMinutes) : null;
+    startTransition(async () => {
+      if (recurrence.frequency !== "none") {
+        const startTimeVal =
+          composer.kind === "timed" ? toTimeValue(composer.startMinutes) : null;
 
-      const result = await createTaskSeries({
-        title,
-        category,
-        priority,
-        recurrenceRule: {
-          ...recurrence,
-          interval: recurrence.interval ?? 1,
-          endsOn: recurrence.endsOn || null,
-        },
-        startsOn: selectedDate,
-        startTime: startTimeVal,
-        estimatedMinutes: Number(duration) || 30,
-      });
+        const result = await createTaskSeries({
+          title,
+          category,
+          priority,
+          recurrenceRule: {
+            ...recurrence,
+            interval: recurrence.interval ?? 1,
+            endsOn: recurrence.endsOn || null,
+          },
+          startsOn: selectedDate,
+          startTime: startTimeVal,
+          estimatedMinutes: Number(duration) || 30,
+        });
 
-      if (result.ok) {
-        resetComposer();
+        if (result.ok) {
+          resetComposer();
+        } else {
+          setErrorMsg(result.error.message || "Gagal membuat tugas berulang.");
+        }
       } else {
-        setErrorMsg(result.error.message || "Gagal membuat tugas berulang.");
-      }
-    } else {
-      const formData = new FormData(event.currentTarget);
-      const result = await createTask(formData, crypto.randomUUID());
+        const optimisticId = crypto.randomUUID();
+        
+        // --- Optimistic UI Update ---
+        if (addOptimisticTask) {
+          const startTimeVal = composer.kind === "timed" ? toTimeValue(composer.startMinutes) : null;
+          addOptimisticTask({
+            id: optimisticId,
+            user_id: "optimistic",
+            title,
+            category,
+            priority,
+            estimated_minutes: Number(duration) || 30,
+            start_time: startTimeVal,
+            scheduled_date: selectedDate,
+            is_completed: false,
+            created_at: new Date().toISOString(),
+          } as Task);
+        }
 
-      if (result.ok) {
-        resetComposer();
-      } else {
-        setErrorMsg(result.error.message || "Tugas belum berhasil disimpan.");
-      }
-    }
+        const result = await createTask(formData, optimisticId);
 
-    setIsCreating(false);
+        if (result.ok) {
+          resetComposer();
+        } else {
+          setErrorMsg(result.error.message || "Tugas belum berhasil disimpan.");
+        }
+      }
+      setIsCreating(false);
+    });
   }
 
   function toggleTask(task: Task) {
     startTransition(() => {
+      if (addOptimisticTask) {
+        addOptimisticTask({ ...task, is_completed: !task.is_completed });
+      }
       void updateTaskStatus(task.id, !task.is_completed);
     });
   }

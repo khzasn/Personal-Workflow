@@ -8,7 +8,7 @@
  * - Transisi antara tampilan kalender bulanan, mingguan, dan drawer agenda harian
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useOptimistic } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
   addDays,
@@ -32,6 +32,18 @@ interface DashboardCalendarProps {
 }
 
 export function DashboardCalendar({ tasks }: DashboardCalendarProps) {
+  const [optimisticTasks, addOptimisticTask] = useOptimistic<Task[], Task>(
+    tasks,
+    (state, newTask) => {
+      // Jika tugas dengan ID yang sama sudah ada (update), ganti. Jika tidak, tambahkan.
+      const exists = state.some((t) => t.id === newTask.id);
+      if (exists) {
+        return state.map((t) => (t.id === newTask.id ? newTask : t));
+      }
+      return [newTask, ...state];
+    }
+  );
+
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -169,14 +181,14 @@ export function DashboardCalendar({ tasks }: DashboardCalendarProps) {
       {/* Render Tampilan Kalender Sesuai Mode */}
       {currentView === "month" && (
         <CalendarView
-          tasks={tasks}
+          tasks={optimisticTasks}
           onSelectDate={handleSelectDateFromMonth}
         />
       )}
 
       {currentView === "week" && (
         <WeeklyCalendarView
-          tasks={tasks}
+          tasks={optimisticTasks}
           currentDate={currentDate}
           onDateChange={handleDateChange}
           onOpenCreateModal={handleOpenCreateFromWeek}
@@ -213,7 +225,8 @@ export function DashboardCalendar({ tasks }: DashboardCalendarProps) {
         }}
         selectedDate={selectedDate}
         initialStartTime={drawerStartTime}
-        tasks={tasks}
+        tasks={optimisticTasks}
+        addOptimisticTask={addOptimisticTask}
         onPreviousDay={handlePreviousDay}
         onNextDay={handleNextDay}
       />
