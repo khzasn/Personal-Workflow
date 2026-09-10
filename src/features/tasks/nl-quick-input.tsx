@@ -74,9 +74,9 @@ export function NlQuickInput() {
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="Ketik tugas dengan bahasa bebas (contoh: Meeting besok jam 10 pagi selama 45 menit)..."
+          placeholder="Ketik tugas bebas (contoh: Meeting besok jam 10 pagi 45m)..."
           disabled={isAnalyzing}
-          className="flex-1 bg-transparent px-3 text-xs font-semibold text-foreground outline-none placeholder:font-medium placeholder:text-muted-foreground/60 sm:text-sm"
+          className="flex-1 bg-transparent px-2.5 text-xs font-semibold text-foreground outline-none placeholder:font-medium placeholder:text-muted-foreground/60 sm:px-3 sm:text-sm"
         />
 
         <button

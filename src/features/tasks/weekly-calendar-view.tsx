@@ -192,87 +192,90 @@ export function WeeklyCalendarView({
         </div>
       </div>
 
-      {/* Header Kolom 7 Hari (Sticky di atas saat scroll) */}
-      <div className="grid grid-cols-[52px_repeat(7,minmax(110px,1fr))] border-b bg-muted/40 text-xs font-semibold text-muted-foreground overflow-x-auto">
-        <div className="border-r border-border/40 py-2.5 text-center text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-          Jam
-        </div>
-        {weekDays.map((day) => {
-          const isDayToday = isToday(day);
-          const dateStr = format(day, "yyyy-MM-dd");
-          return (
-            <div
-              key={dateStr}
-              onClick={() => onViewDay(dateStr)}
-              className={`group cursor-pointer border-r border-border/40 py-2 px-1 text-center transition-colors hover:bg-primary/[0.04] ${
-                isDayToday ? "bg-primary/[0.06] text-primary" : ""
-              }`}
-              title="Klik untuk membuka tampilan harian"
-            >
-              <p className="text-[11px] font-medium uppercase tracking-wider opacity-80">
-                {format(day, "EEE", { locale: id })}
-              </p>
-              <div className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold transition-transform group-hover:scale-110">
-                <span
-                  className={
-                    isDayToday
-                      ? "flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xs"
-                      : "text-foreground"
-                  }
-                >
-                  {format(day, "d")}
-                </span>
-              </div>
+      {/* Kontainer Horizontal Scroll Terpadu (Header, All-day, dan Timeline selalu sinkron) */}
+      <div className="overflow-x-auto pretty-scrollbar">
+        <div className="min-w-[822px]">
+          {/* Header Kolom 7 Hari (Sticky di atas saat scroll) */}
+          <div className="grid grid-cols-[52px_repeat(7,minmax(110px,1fr))] border-b bg-muted/40 text-xs font-semibold text-muted-foreground">
+            <div className="border-r border-border/40 py-2.5 text-center text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+              Jam
             </div>
-          );
-        })}
-      </div>
-
-      {/* Bagian Atas: Tugas Tanpa Jam (Unscheduled / All-Day) */}
-      <div className="grid grid-cols-[52px_repeat(7,minmax(110px,1fr))] border-b border-dashed border-border/60 bg-muted/20 text-xs overflow-x-auto">
-        <div className="flex items-center justify-center border-r border-border/40 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60">
-          All-day
-        </div>
-        {weekDays.map((day) => {
-          const dateStr = format(day, "yyyy-MM-dd");
-          const unscheduled = tasks.filter(
-            (t) => t.scheduled_date === dateStr && !t.start_time
-          );
-
-          return (
-            <div
-              key={dateStr}
-              className="border-r border-border/40 p-1 min-h-[36px] flex flex-col gap-1"
-            >
-              {unscheduled.map((task) => (
+            {weekDays.map((day) => {
+              const isDayToday = isToday(day);
+              const dateStr = format(day, "yyyy-MM-dd");
+              return (
                 <div
-                  key={task.id}
-                  onClick={() => onOpenTaskDetail(dateStr)}
-                  className={`cursor-pointer truncate rounded-md border px-1.5 py-0.5 text-[10px] font-bold leading-tight transition-all hover:brightness-95 ${
-                    categoryColors[task.category] || "bg-muted"
-                  } ${task.is_completed ? "line-through opacity-50" : ""}`}
+                  key={dateStr}
+                  onClick={() => onViewDay(dateStr)}
+                  className={`group cursor-pointer border-r border-border/40 py-2 px-1 text-center transition-colors hover:bg-primary/[0.04] ${
+                    isDayToday ? "bg-primary/[0.06] text-primary" : ""
+                  }`}
+                  title="Klik untuk membuka tampilan harian"
                 >
-                  {task.title}
+                  <p className="text-[11px] font-medium uppercase tracking-wider opacity-80">
+                    {format(day, "EEE", { locale: id })}
+                  </p>
+                  <div className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold transition-transform group-hover:scale-110">
+                    <span
+                      className={
+                        isDayToday
+                          ? "flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xs"
+                          : "text-foreground"
+                      }
+                    >
+                      {format(day, "d")}
+                    </span>
+                  </div>
                 </div>
-              ))}
-            </div>
-          );
-        })}
-      </div>
+              );
+            })}
+          </div>
 
-      {/* Area Timeline Grid dengan Scroll Vertikal */}
-      <div
-        ref={scrollContainerRef}
-        className="pretty-scrollbar relative overflow-x-auto overflow-y-auto"
-        style={{ maxHeight: "600px" }}
-      >
-        <div
-          ref={gridRef}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          className="grid grid-cols-[52px_repeat(7,minmax(110px,1fr))] relative touch-none"
-          style={{ height: totalHeight }}
-        >
+          {/* Bagian Atas: Tugas Tanpa Jam (Unscheduled / All-Day) */}
+          <div className="grid grid-cols-[52px_repeat(7,minmax(110px,1fr))] border-b border-dashed border-border/60 bg-muted/20 text-xs">
+            <div className="flex items-center justify-center border-r border-border/40 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60">
+              All-day
+            </div>
+            {weekDays.map((day) => {
+              const dateStr = format(day, "yyyy-MM-dd");
+              const unscheduled = tasks.filter(
+                (t) => t.scheduled_date === dateStr && !t.start_time
+              );
+
+              return (
+                <div
+                  key={dateStr}
+                  className="border-r border-border/40 p-1 min-h-[36px] flex flex-col gap-1"
+                >
+                  {unscheduled.map((task) => (
+                    <div
+                      key={task.id}
+                      onClick={() => onOpenTaskDetail(dateStr)}
+                      className={`cursor-pointer truncate rounded-md border px-1.5 py-0.5 text-[10px] font-bold leading-tight transition-all hover:brightness-95 ${
+                        categoryColors[task.category] || "bg-muted"
+                      } ${task.is_completed ? "line-through opacity-50" : ""}`}
+                    >
+                      {task.title}
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Area Timeline Grid dengan Scroll Vertikal */}
+          <div
+            ref={scrollContainerRef}
+            className="pretty-scrollbar relative overflow-y-auto"
+            style={{ maxHeight: "600px" }}
+          >
+            <div
+              ref={gridRef}
+              onPointerMove={onPointerMove}
+              onPointerUp={onPointerUp}
+              className="grid grid-cols-[52px_repeat(7,minmax(110px,1fr))] relative"
+              style={{ height: totalHeight }}
+            >
           {/* Garis Horizontal Jam & Kolom Jam Kiri */}
           {hours.map((hour, idx) => (
             <div
@@ -438,6 +441,8 @@ export function WeeklyCalendarView({
               </div>
             </div>
           )}
+        </div>
+      </div>
         </div>
       </div>
     </div>

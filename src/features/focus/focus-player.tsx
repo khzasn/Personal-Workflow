@@ -63,9 +63,9 @@ export function FocusPlayer({ session, onSessionFinish }: FocusPlayerProps) {
   return (
     <aside
       aria-label="Sesi Fokus Aktif"
-      className="fixed bottom-5 right-5 z-40 animate-in slide-in-from-bottom-5 duration-300"
+      className="fixed bottom-4 inset-x-3 z-40 animate-in slide-in-from-bottom-5 duration-300 sm:bottom-5 sm:inset-x-auto sm:right-5"
     >
-      <div className="flex items-center gap-3.5 rounded-2xl border border-border/80 bg-white/90 p-3 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/90 sm:px-4 sm:py-3.5">
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-border/80 bg-white/95 p-3 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/95 sm:gap-3.5 sm:px-4 sm:py-3.5">
         {/* Progress Ring Mini */}
         <div className="relative flex h-11 w-11 items-center justify-center shrink-0">
           <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">

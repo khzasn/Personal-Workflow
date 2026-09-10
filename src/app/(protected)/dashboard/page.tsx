@@ -163,7 +163,7 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <span className="hidden rounded-full border bg-white/60 px-3 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur dark:bg-white/5 md:inline">
                 {user?.email}
               </span>
@@ -174,10 +174,12 @@ export default async function DashboardPage() {
               <form action={signOut}>
                 <button
                   type="submit"
-                  className="flex items-center gap-1.5 rounded-full border bg-background/70 px-3 py-2 text-xs font-semibold text-muted-foreground transition-all hover:-translate-y-0.5 hover:bg-muted hover:text-foreground"
+                  aria-label="Keluar"
+                  title="Keluar dari akun"
+                  className="flex items-center gap-1.5 rounded-full border bg-background/70 px-2.5 py-2 text-xs font-semibold text-muted-foreground transition-all hover:-translate-y-0.5 hover:bg-muted hover:text-foreground sm:px-3"
                 >
                   <LogOut className="h-3.5 w-3.5" />
-                  <span>Keluar</span>
+                  <span className="hidden sm:inline">Keluar</span>
                 </button>
               </form>
             </div>

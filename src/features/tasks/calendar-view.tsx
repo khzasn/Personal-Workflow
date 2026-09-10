@@ -178,7 +178,7 @@ export function CalendarView({ tasks, onSelectDate }: CalendarViewProps) {
               <div
                 key={dateStr}
                 onClick={() => onSelectDate(dateStr)}
-                className={`group relative min-h-23.75 cursor-pointer select-none flex-col justify-between p-2.5 transition-all duration-200 sm:min-h-28.75 ${
+                className={`group relative min-h-[58px] cursor-pointer select-none flex flex-col justify-between p-1 transition-all duration-200 sm:min-h-28.75 sm:p-2.5 ${
                   !isCurrentMonth
                     ? "bg-muted/20 text-muted-foreground/40"
                     : "bg-white/40 hover:z-10 hover:-translate-y-0.5 hover:bg-primary/[0.04] hover:shadow-lg dark:bg-transparent"
@@ -187,7 +187,7 @@ export function CalendarView({ tasks, onSelectDate }: CalendarViewProps) {
                 {/* Top Cell: Date Number & Add button */}
                 <div className="flex items-center justify-between">
                   <span
-                    className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold transition-transform group-hover:scale-105 ${
+                    className={`inline-flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full text-[11px] sm:text-xs font-bold transition-transform group-hover:scale-105 ${
                       isCurrentDay
                         ? "bg-primary text-primary-foreground shadow-xs"
                         : "text-foreground"
@@ -201,15 +201,15 @@ export function CalendarView({ tasks, onSelectDate }: CalendarViewProps) {
                       e.stopPropagation();
                       onSelectDate(dateStr);
                     }}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity rounded p-0.5 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                    className="hidden sm:inline-flex opacity-0 group-hover:opacity-100 transition-opacity rounded p-0.5 text-muted-foreground hover:bg-primary/10 hover:text-primary"
                     aria-label={`Tambah tugas untuk ${dateStr}`}
                   >
                     <Plus className="h-3.5 w-3.5" />
                   </button>
                 </div>
 
-                {/* Middle Cell: Tasks chips list (up to 2 visible + counter) */}
-                <div className="flex-1 my-1.5 space-y-1 overflow-hidden">
+                {/* Desktop: Tasks chips list (up to 2 visible + counter) */}
+                <div className="hidden sm:block flex-1 my-1.5 space-y-1 overflow-hidden">
                   {dayTasks.slice(0, 2).map((task) => (
                     <div
                       key={task.id}
@@ -244,11 +244,28 @@ export function CalendarView({ tasks, onSelectDate }: CalendarViewProps) {
                   )}
                 </div>
 
-                {/* Bottom Cell: Active task indicator dot for mobile view */}
-                {activeCount > 0 && (
-                  <div className="sm:hidden flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                    <span className="text-[9px] text-muted-foreground">{activeCount}</span>
+                {/* Mobile: Clean colored indicator dots */}
+                {dayTasks.length > 0 && (
+                  <div className="sm:hidden mt-1 flex flex-wrap items-center justify-center gap-1">
+                    {dayTasks.slice(0, 3).map((task) => (
+                      <span
+                        key={task.id}
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          task.category === "Kerja"
+                            ? "bg-blue-500"
+                            : task.category === "Belajar"
+                              ? "bg-emerald-500"
+                              : task.category === "Pribadi"
+                                ? "bg-purple-500"
+                                : "bg-amber-500"
+                        } ${task.is_completed ? "opacity-35 ring-1 ring-border" : "shadow-xs"}`}
+                      />
+                    ))}
+                    {dayTasks.length > 3 && (
+                      <span className="text-[8px] font-extrabold text-muted-foreground leading-none">
+                        +{dayTasks.length - 3}
+                      </span>
+                    )}
                   </div>
                 )}
               </div>

@@ -711,12 +711,12 @@ function QuickComposer({
         className="w-full border-0 bg-transparent px-0 py-1 text-base font-semibold outline-none placeholder:font-medium placeholder:text-muted-foreground/60"
       />
       <input type="hidden" name="description" value="" />
-      <div className="mt-2 grid grid-cols-3 gap-2">
+      <div className="mt-2 grid grid-cols-3 gap-1.5 sm:gap-2">
         <select
           name="category"
           value={category}
           onChange={(event) => onCategoryChange(event.target.value as TaskCategory)}
-          className="min-w-0 rounded-lg border bg-background px-2.5 py-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-primary/30"
+          className="min-w-0 rounded-lg border bg-background px-1.5 py-1.5 sm:px-2.5 sm:py-2 text-[11px] sm:text-xs font-semibold outline-none focus:ring-2 focus:ring-primary/30"
           aria-label="Kategori"
         >
           <option value="Kerja">Kerja</option>
@@ -728,19 +728,19 @@ function QuickComposer({
           name="priority"
           value={priority}
           onChange={(event) => onPriorityChange(event.target.value as TaskPriority)}
-          className="min-w-0 rounded-lg border bg-background px-2.5 py-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-primary/30"
+          className="min-w-0 rounded-lg border bg-background px-1.5 py-1.5 sm:px-2.5 sm:py-2 text-[11px] sm:text-xs font-semibold outline-none focus:ring-2 focus:ring-primary/30"
           aria-label="Prioritas"
         >
-          <option value="urgent">🔴 Urgent (P1)</option>
-          <option value="high">🟠 High (P2)</option>
-          <option value="medium">🟣 Medium (P3)</option>
-          <option value="low">⚪ Low (P4)</option>
+          <option value="urgent">🔴 Urgent</option>
+          <option value="high">🟠 High</option>
+          <option value="medium">🟣 Medium</option>
+          <option value="low">⚪ Low</option>
         </select>
         <select
           name="estimated_minutes"
           value={duration}
           onChange={(event) => onDurationChange(event.target.value)}
-          className="min-w-0 rounded-lg border bg-background px-2.5 py-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-primary/30"
+          className="min-w-0 rounded-lg border bg-background px-1.5 py-1.5 sm:px-2.5 sm:py-2 text-[11px] sm:text-xs font-semibold outline-none focus:ring-2 focus:ring-primary/30"
           aria-label="Durasi"
         >
           <option value="15">15 menit</option>
@@ -824,20 +824,20 @@ function UnscheduledCard({
           <button
             type="button"
             onClick={() => openFocusModal(task)}
-            className="rounded p-1 text-primary/80 opacity-0 transition hover:bg-primary/10 hover:text-primary group-hover:opacity-100 focus:opacity-100"
+            className="rounded p-1 text-primary/80 opacity-100 sm:opacity-0 transition hover:bg-primary/10 hover:text-primary sm:group-hover:opacity-100 focus:opacity-100"
             title="Mulai sesi fokus"
             aria-label="Mulai sesi fokus"
           >
-            <Timer className="h-3 w-3" />
+            <Timer className="h-3.5 w-3.5" />
           </button>
         )}
         <button
           type="button"
           onClick={onDelete}
-          className="rounded p-1 opacity-0 transition hover:bg-black/5 hover:text-destructive group-hover:opacity-100 focus:opacity-100"
+          className="rounded p-1 text-muted-foreground opacity-100 sm:opacity-0 transition hover:bg-black/5 hover:text-destructive sm:group-hover:opacity-100 focus:opacity-100"
           aria-label="Hapus tugas"
         >
-          <Trash2 className="h-3 w-3" />
+          <Trash2 className="h-3.5 w-3.5" />
         </button>
       </div>
     </div>
@@ -915,20 +915,20 @@ function TimedTaskCard({
             <button
               type="button"
               onClick={() => openFocusModal(task)}
-              className="rounded p-0.5 text-primary/80 opacity-0 transition hover:bg-primary/10 hover:text-primary group-hover:opacity-100 focus:opacity-100"
+              className="rounded p-1 text-primary/80 opacity-100 sm:opacity-0 transition hover:bg-primary/10 hover:text-primary sm:group-hover:opacity-100 focus:opacity-100"
               title="Mulai sesi fokus"
               aria-label="Mulai sesi fokus"
             >
-              <Timer className="h-3 w-3" />
+              <Timer className="h-3.5 w-3.5" />
             </button>
           )}
           <button
             type="button"
             onClick={onDelete}
-            className="rounded p-0.5 opacity-0 transition hover:bg-black/5 hover:text-destructive group-hover:opacity-100 focus:opacity-100"
+            className="rounded p-1 text-muted-foreground opacity-100 sm:opacity-0 transition hover:bg-black/5 hover:text-destructive sm:group-hover:opacity-100 focus:opacity-100"
             aria-label="Hapus tugas"
           >
-            <Trash2 className="h-3 w-3" />
+            <Trash2 className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
