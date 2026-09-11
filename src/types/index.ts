@@ -178,3 +178,47 @@ export interface StartFocusInput {
   taskId?: string | null;
   plannedMinutes: number;
 }
+
+// ---------------------------------------------------------------------------
+// Habit Tracker
+// ---------------------------------------------------------------------------
+
+export type HabitFrequency = "daily" | "weekly" | "monthly";
+export type HabitStatus = "done" | "skipped" | "pending";
+export type HabitReminderTime = "morning" | "afternoon" | "evening";
+export type HabitColor = "violet" | "blue" | "green" | "rose" | "amber" | "orange" | "cyan" | "pink";
+
+export interface Habit {
+  id: string;
+  user_id: string;
+  title: string;
+  emoji: string;
+  color: HabitColor;
+  target_value: number;
+  target_unit: string;
+  frequency: HabitFrequency;
+  frequency_days: number[] | null;
+  reminder_time: HabitReminderTime | null;
+  created_at: string;
+}
+
+export interface HabitCompletion {
+  id: string;
+  habit_id: string;
+  user_id: string;
+  completed_date: string; // YYYY-MM-DD
+  status: "done" | "skipped";
+  created_at: string;
+}
+
+export interface HabitWithTodayStatus extends Habit {
+  todayStatus: HabitStatus;
+}
+
+export interface HabitStats {
+  currentStreak: number;
+  longestStreak: number;
+  completionRate: number; // 0-100
+  totalCompleted: number;
+  completionsThisMonth: HabitCompletion[];
+}

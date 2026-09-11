@@ -1,4 +1,4 @@
-﻿import { Suspense, type ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardCalendar } from "@/features/tasks/dashboard-calendar";
 import { BriefingList } from "@/features/briefings/briefing-list";
@@ -15,6 +15,8 @@ import { CheckCircle2, Flame, Sparkles, Timer } from "lucide-react";
 import { ReminderProvider } from "@/features/reminders/reminder-context";
 import { ReminderBell } from "@/features/reminders/reminder-bell";
 import { AlarmBanner } from "@/features/reminders/alarm-banner";
+import { getTodayHabits } from "@/features/habits/actions";
+import { HabitList } from "@/features/habits/habit-list";
 
 export const metadata = {
   title: "Dayflow | Dashboard",
@@ -100,12 +102,13 @@ export default async function DashboardPage() {
     .in("status", ["running", "paused"])
     .maybeSingle();
 
-  const [completionTrend, categoryDistribution, focusWeekStats, activityHeatmap] =
+  const [completionTrend, categoryDistribution, focusWeekStats, activityHeatmap, todayHabits] =
     await Promise.all([
       getTaskCompletionTrend(7),
       getCategoryDistribution(),
       getFocusWeekStats(7),
       getActivityHeatmap(12),
+      getTodayHabits(),
     ]);
 
   return (
@@ -179,6 +182,11 @@ export default async function DashboardPage() {
                   />
                 </div>
               </div>
+            </section>
+
+            {/* Habit Hari Ini */}
+            <section>
+              <HabitList initialHabits={todayHabits} />
             </section>
 
             {/* ① Briefing Harian — konten utama */}

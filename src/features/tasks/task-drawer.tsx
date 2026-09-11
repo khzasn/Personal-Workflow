@@ -148,7 +148,6 @@ export function TaskDrawer({
   const [category, setCategory] = useState<TaskCategory>("Kerja");
   const [priority, setPriority] = useState<TaskPriority>("medium");
   const [duration, setDuration] = useState(String(DEFAULT_DURATION));
-  const [recurrence, setRecurrence] = useState<RecurrenceRule>({ frequency: "none" });
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
@@ -197,7 +196,6 @@ export function TaskDrawer({
     setCategory("Kerja");
     setPriority("medium");
     setDuration(String(DEFAULT_DURATION));
-    setRecurrence({ frequency: "none" });
     setErrorMsg(null);
   }
 
@@ -207,7 +205,6 @@ export function TaskDrawer({
     setCategory("Kerja");
     setPriority("medium");
     setDuration(String(DEFAULT_DURATION));
-    setRecurrence({ frequency: "none" });
     setErrorMsg(null);
   }
 
@@ -346,56 +343,31 @@ export function TaskDrawer({
     const formData = new FormData(event.currentTarget);
 
     startTransition(async () => {
-      if (recurrence.frequency !== "none") {
-        const startTimeVal =
-          composer.kind === "timed" ? toTimeValue(composer.startMinutes) : null;
-
-        const result = await createTaskSeries({
+      const optimisticId = crypto.randomUUID();
+      
+      // --- Optimistic UI Update ---
+      if (addOptimisticTask) {
+        const startTimeVal = composer.kind === "timed" ? toTimeValue(composer.startMinutes) : null;
+        addOptimisticTask({
+          id: optimisticId,
+          user_id: "optimistic",
           title,
           category,
           priority,
-          recurrenceRule: {
-            ...recurrence,
-            interval: recurrence.interval ?? 1,
-            endsOn: recurrence.endsOn || null,
-          },
-          startsOn: selectedDate,
-          startTime: startTimeVal,
-          estimatedMinutes: Number(duration) || 30,
-        });
+          estimated_minutes: Number(duration) || 30,
+          start_time: startTimeVal,
+          scheduled_date: selectedDate,
+          is_completed: false,
+          created_at: new Date().toISOString(),
+        } as Task);
+      }
 
-        if (result.ok) {
-          resetComposer();
-        } else {
-          setErrorMsg(result.error.message || "Gagal membuat tugas berulang.");
-        }
+      const result = await createTask(formData, optimisticId);
+
+      if (result.ok) {
+        resetComposer();
       } else {
-        const optimisticId = crypto.randomUUID();
-        
-        // --- Optimistic UI Update ---
-        if (addOptimisticTask) {
-          const startTimeVal = composer.kind === "timed" ? toTimeValue(composer.startMinutes) : null;
-          addOptimisticTask({
-            id: optimisticId,
-            user_id: "optimistic",
-            title,
-            category,
-            priority,
-            estimated_minutes: Number(duration) || 30,
-            start_time: startTimeVal,
-            scheduled_date: selectedDate,
-            is_completed: false,
-            created_at: new Date().toISOString(),
-          } as Task);
-        }
-
-        const result = await createTask(formData, optimisticId);
-
-        if (result.ok) {
-          resetComposer();
-        } else {
-          setErrorMsg(result.error.message || "Tugas belum berhasil disimpan.");
-        }
+        setErrorMsg(result.error.message || "Tugas belum berhasil disimpan.");
       }
       setIsCreating(false);
     });
@@ -554,8 +526,6 @@ export function TaskDrawer({
                 onPriorityChange={setPriority}
                 duration={duration}
                 onDurationChange={setDuration}
-                recurrence={recurrence}
-                onRecurrenceChange={setRecurrence}
                 selectedDate={selectedDate}
                 startTime={null}
                 errorMsg={errorMsg}
@@ -679,8 +649,6 @@ export function TaskDrawer({
                     onPriorityChange={setPriority}
                     duration={duration}
                     onDurationChange={setDuration}
-                    recurrence={recurrence}
-                    onRecurrenceChange={setRecurrence}
                     selectedDate={selectedDate}
                     startTime={toTimeValue(composer.startMinutes)}
                     errorMsg={errorMsg}
@@ -708,13 +676,11 @@ interface QuickComposerProps {
   onPriorityChange: (value: TaskPriority) => void;
   duration: string;
   onDurationChange: (value: string) => void;
-  recurrence: RecurrenceRule;
-  onRecurrenceChange: (value: RecurrenceRule) => void;
   selectedDate: string | null;
   startTime: string | null;
   errorMsg: string | null;
   isCreating: boolean;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onSubmit: (e: FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
 }
 
@@ -728,8 +694,6 @@ function QuickComposer({
   onPriorityChange,
   duration,
   onDurationChange,
-  recurrence,
-  onRecurrenceChange,
   selectedDate,
   startTime,
   errorMsg,
@@ -808,12 +772,6 @@ function QuickComposer({
           <option value="120">2 jam</option>
         </select>
       </div>
-
-      {/* Kontrol Pengulangan Tugas (Recurrence Picker) */}
-      <div className="mt-3 pt-2.5 border-t border-border/50">
-        <RecurrencePicker value={recurrence} onChange={onRecurrenceChange} />
-      </div>
-
       {errorMsg && <p className="mt-2 text-xs font-medium text-destructive">{errorMsg}</p>}
       <div className="mt-3 flex items-center justify-end gap-2">
         <span className="mr-auto hidden text-[10px] text-muted-foreground sm:inline">

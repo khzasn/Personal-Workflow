@@ -21,7 +21,6 @@ import type { Task } from "@/types";
 import { CalendarView } from "./calendar-view";
 import { WeeklyCalendarView } from "./weekly-calendar-view";
 import { TaskDrawer } from "./task-drawer";
-import { NlQuickInput } from "./nl-quick-input";
 import {
   CalendarViewSwitcher,
   type CalendarViewMode,
@@ -167,9 +166,6 @@ export function DashboardCalendar({ tasks }: DashboardCalendarProps) {
 
   return (
     <div className="space-y-4">
-      {/* Natural-Language Task Input AI Bar */}
-      <NlQuickInput />
-
       {/* Baris Atas: View Switcher */}
       <div className="flex items-center justify-between">
         <CalendarViewSwitcher

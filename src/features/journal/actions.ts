@@ -95,3 +95,41 @@ export async function deleteJournalEntry(
   revalidatePath("/jurnal");
   return { success: true };
 }
+
+import { getServerEnv } from "@/lib/env";
+import { GoogleGenAI } from "@google/genai";
+
+export async function polishJournalWithAI(content: string): Promise<{ success: boolean; polished?: string; error?: string }> {
+  if (!content || !content.trim()) return { success: false, error: "Konten kosong" };
+
+  try {
+    const env = getServerEnv();
+    const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
+    
+    const prompt = `Anda adalah asisten penulis jurnal pribadi.
+Tugas Anda: rapikan tulisan jurnal berikut. Perbaiki ejaan, tanda baca, dan alur kalimat agar lebih enak dibaca.
+ATURAN MUTLAK:
+1. PERTAHANKAN gaya bahasa dan suara asli penulis (casual, santai, dll).
+2. JANGAN mengubah makna, cerita, atau fakta di dalamnya.
+3. JANGAN menambahkan informasi baru yang tidak ada di teks asli.
+4. JANGAN membalas dengan kata pengantar, langsung berikan hasil perbaikannya saja.
+
+Teks asli:
+"""
+${content}
+"""`;
+
+    const response = await ai.models.generateContent({
+      model: env.GEMINI_MODEL,
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      config: { temperature: 0.3 },
+    });
+
+    if (!response.text) return { success: false, error: "Gagal memoles tulisan." };
+
+    return { success: true, polished: response.text.trim() };
+  } catch (error) {
+    console.error("Gagal memoles jurnal:", error);
+    return { success: false, error: "Gagal terhubung ke layanan AI." };
+  }
+}
