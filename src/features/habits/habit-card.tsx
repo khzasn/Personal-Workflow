@@ -50,7 +50,10 @@ export function HabitCard({ habit, onStatusChange }: { habit: HabitWithTodayStat
   return (
     <div className="relative overflow-hidden rounded-[20px]">
       {/* Background for swipe reveal */}
-      <div className="absolute inset-0 flex items-center bg-amber-500/20 px-5 text-amber-600 dark:text-amber-400 font-bold text-xs">
+      <div 
+        className="absolute inset-0 flex items-center bg-amber-500/20 px-5 text-amber-600 dark:text-amber-400 font-bold text-xs"
+        style={{ opacity: swipeOffset > 0 ? 1 : 0, transition: swipeOffset > 0 ? "none" : "opacity 0.2s" }}
+      >
         <span>Dilewati (Skip)</span>
       </div>
 
