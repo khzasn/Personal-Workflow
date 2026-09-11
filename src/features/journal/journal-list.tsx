@@ -47,13 +47,7 @@ function JournalEntryCard({ entry, onDelete }: JournalEntryCardProps) {
       {/* Header */}
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
-          {/* Mood badge */}
-          <span
-            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${mood.color}`}
-          >
-            <span className="text-sm leading-none">{mood.emoji}</span>
-            {mood.label}
-          </span>
+
           {/* Date */}
           <time className="text-[11px] text-muted-foreground">
             {format(new Date(entry.created_at), "EEEE, d MMMM yyyy · HH:mm", {

@@ -94,29 +94,7 @@ export function JournalEditor({ onSaved }: JournalEditorProps) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Mood Selector */}
-        <div>
-          <p className="mb-2 text-xs font-semibold text-muted-foreground">
-            Suasana hati
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {MOODS.map((m) => (
-              <button
-                key={m.value}
-                type="button"
-                onClick={() => setMood(m.value)}
-                className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
-                  mood === m.value
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-background/60 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                }`}
-              >
-                <span className="text-base leading-none">{m.emoji}</span>
-                <span>{m.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+
 
         {/* Textarea */}
         <div className="relative">
