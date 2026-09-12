@@ -54,6 +54,7 @@ const publicEnvSchema = z.object({
     .string()
     .url("NEXT_PUBLIC_APP_URL must be a valid URL")
     .min(1),
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -65,7 +66,7 @@ const serverEnvSchema = z.object({
     .string()
     .min(1, "SUPABASE_SERVICE_ROLE_KEY is required"),
   GEMINI_API_KEY: z.string().min(1, "GEMINI_API_KEY is required"),
-  GEMINI_MODEL: z.string().default("gemini-2.5-flash"),
+  GEMINI_MODEL: z.string().default("gemini-1.5-flash"),
   RSS_FEED_URLS: z.string().transform(parseHttpsFeedArray),
   RSS_CACHE_TTL_HOURS: z.coerce
     .number()
@@ -84,6 +85,7 @@ const serverEnvSchema = z.object({
     .min(1000)
     .default(8000),
   APP_TIMEZONE: z.string().default("Asia/Bangkok"),
+  VAPID_PRIVATE_KEY: z.string().optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -125,6 +127,7 @@ export function getPublicEnv() {
     supabaseUrl: result.data.NEXT_PUBLIC_SUPABASE_URL,
     supabasePublicKey: getPublicKey(),
     appUrl: result.data.NEXT_PUBLIC_APP_URL,
+    vapidPublicKey: result.data.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
   };
 }
 
@@ -143,6 +146,7 @@ export function getServerEnv() {
     RSS_MAX_ARTICLES_PER_FEED: process.env.RSS_MAX_ARTICLES_PER_FEED,
     RSS_REQUEST_TIMEOUT_MS: process.env.RSS_REQUEST_TIMEOUT_MS,
     APP_TIMEZONE: process.env.APP_TIMEZONE,
+    VAPID_PRIVATE_KEY: process.env.VAPID_PRIVATE_KEY,
   });
 
   if (!result.success) {

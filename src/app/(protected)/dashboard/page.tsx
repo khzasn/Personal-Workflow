@@ -14,6 +14,7 @@ import { CheckCircle2, Flame, Sparkles, Timer } from "lucide-react";
 import { ReminderProvider } from "@/features/reminders/reminder-context";
 import { ReminderBell } from "@/features/reminders/reminder-bell";
 import { AlarmBanner } from "@/features/reminders/alarm-banner";
+import { PushManager } from "@/features/reminders/push-manager";
 import { getTodayHabits } from "@/features/habits/actions";
 import { HabitList } from "@/features/habits/habit-list";
 
@@ -176,6 +177,11 @@ export default async function DashboardPage() {
                   />
                 </div>
               </div>
+            </section>
+
+            {/* Pengelola Notifikasi Push */}
+            <section>
+              <PushManager />
             </section>
 
             {/* Habit Hari Ini */}
