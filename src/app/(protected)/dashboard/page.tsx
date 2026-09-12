@@ -1,7 +1,6 @@
 import { Suspense, type ReactNode } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardCalendar } from "@/features/tasks/dashboard-calendar";
-import { BriefingList } from "@/features/briefings/briefing-list";
 import { FocusProvider } from "@/features/focus/focus-context";
 import { AnalyticsSection } from "@/features/analytics/analytics-section";
 import {
@@ -10,7 +9,7 @@ import {
   getFocusWeekStats,
   getActivityHeatmap,
 } from "@/features/analytics/queries";
-import type { Task, Briefing, FocusSession } from "@/types";
+import type { Task, FocusSession } from "@/types";
 import { CheckCircle2, Flame, Sparkles, Timer } from "lucide-react";
 import { ReminderProvider } from "@/features/reminders/reminder-context";
 import { ReminderBell } from "@/features/reminders/reminder-bell";
@@ -61,11 +60,6 @@ export default async function DashboardPage() {
     .from("tasks")
     .select("*")
     .order("created_at", { ascending: false });
-
-  const { data: briefings } = await supabase
-    .from("briefings")
-    .select("*")
-    .order("published_at", { ascending: false });
 
   const allTasks = (tasks || []) as Task[];
   const activeTasks = allTasks.filter((task) => !task.is_completed);
@@ -189,12 +183,7 @@ export default async function DashboardPage() {
               <HabitList initialHabits={todayHabits} />
             </section>
 
-            {/* ① Briefing Harian — konten utama */}
-            <section>
-              <BriefingList briefings={(briefings || []) as Briefing[]} />
-            </section>
-
-            {/* ② Analitik Produktivitas — konten utama */}
+            {/* ② Analitik Produktivitas */}
             <section>
               <AnalyticsSection
                 completionTrend={completionTrend}

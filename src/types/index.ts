@@ -213,6 +213,7 @@ export interface HabitCompletion {
 
 export interface HabitWithTodayStatus extends Habit {
   todayStatus: HabitStatus;
+  weekCompletions: HabitCompletion[];
 }
 
 export interface HabitStats {

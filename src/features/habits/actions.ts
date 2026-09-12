@@ -12,23 +12,29 @@ export async function getTodayHabits(): Promise<HabitWithTodayStatus[]> {
 
   const todayDate = format(new Date(), "yyyy-MM-dd");
 
+  // Last 7 days range
+  const weekAgo = format(new Date(Date.now() - 6 * 86400000), "yyyy-MM-dd");
+
   const { data: habits } = await supabase
     .from("habits")
     .select("*")
     .order("created_at", { ascending: true });
 
-  const { data: completions } = await supabase
+  const { data: weekCompletions } = await supabase
     .from("habit_completions")
     .select("*")
-    .eq("completed_date", todayDate);
+    .gte("completed_date", weekAgo)
+    .lte("completed_date", todayDate);
 
   if (!habits) return [];
 
   return habits.map((habit) => {
-    const todayLog = completions?.find((c) => c.habit_id === habit.id);
+    const habitWeekLogs = (weekCompletions || []).filter((c) => c.habit_id === habit.id) as HabitCompletion[];
+    const todayLog = habitWeekLogs.find((c) => c.completed_date === todayDate);
     return {
       ...habit,
       todayStatus: todayLog ? (todayLog.status as "done" | "skipped") : "pending",
+      weekCompletions: habitWeekLogs,
     };
   });
 }
