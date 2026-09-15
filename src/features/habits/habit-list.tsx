@@ -5,12 +5,28 @@ import Link from "next/link";
 import { Plus, Target } from "lucide-react";
 import type { HabitWithTodayStatus } from "@/types";
 import { HabitCard } from "./habit-card";
+import { motion, Variants } from "framer-motion";
 
 export function HabitList({ initialHabits }: { initialHabits: HabitWithTodayStatus[] }) {
   const [optimisticHabits, addOptimisticUpdate] = useOptimistic<HabitWithTodayStatus[], { id: string; status: HabitWithTodayStatus["todayStatus"] }>(
     initialHabits,
     (state, update) => state.map((h) => (h.id === update.id ? { ...h, todayStatus: update.status } : h))
   );
+
+  const container: Variants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  };
 
   return (
     <div className="rounded-[28px] border border-white/60 bg-white/40 p-5 shadow-xs backdrop-blur-xl dark:border-white/5 dark:bg-white/[0.02] sm:p-6 mb-6">
@@ -30,20 +46,22 @@ export function HabitList({ initialHabits }: { initialHabits: HabitWithTodayStat
       </div>
 
       {optimisticHabits.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 py-8 text-center">
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 py-8 text-center">
           <Target className="mb-2 h-8 w-8 text-muted-foreground/30" />
           <p className="text-sm font-semibold text-muted-foreground">Belum ada habit.</p>
           <p className="text-xs text-muted-foreground/60">Tambahkan habit pertama untuk membangun rutinitas.</p>
-        </div>
+        </motion.div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {optimisticHabits.map((habit) => (
-            <HabitCard key={habit.id} habit={habit} onStatusChange={(id, status) => addOptimisticUpdate({ id, status })} />
+            <motion.div key={habit.id} variants={item}>
+              <HabitCard habit={habit} onStatusChange={(id, status) => addOptimisticUpdate({ id, status })} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
       <div className="mt-3 text-[10px] text-muted-foreground text-center">
-        💡 Tip: Swipe ke kanan pada habit untuk menandai "dilewati" (skip).
+        💡 Tip: Geser ke kanan (swipe) pada habit untuk menandai "dilewati" (skip).
       </div>
     </div>
   );

@@ -1,31 +1,30 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
+import { useTransition } from "react";
 import { format, subDays } from "date-fns";
-import { id } from "date-fns/locale";
 import { Check, RotateCcw } from "lucide-react";
 import type { HabitWithTodayStatus, HabitCompletion } from "@/types";
 import { setHabitStatus } from "./actions";
 import Link from "next/link";
+import { motion, useAnimation, PanInfo } from "framer-motion";
 
 const DAY_LABELS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 
 function WeeklyBar({ weekCompletions }: { weekCompletions: HabitCompletion[] }) {
   const today = new Date();
-  // Build last 7 days starting from 6 days ago
   const days = Array.from({ length: 7 }, (_, i) => {
     const date = subDays(today, 6 - i);
     const dateStr = format(date, "yyyy-MM-dd");
     const log = weekCompletions.find((c) => c.completed_date === dateStr);
     const isToday = i === 6;
-    const dayOfWeek = (date.getDay() + 6) % 7; // 0=Mon, 6=Sun
+    const dayOfWeek = (date.getDay() + 6) % 7; 
     return { dateStr, log, isToday, label: DAY_LABELS[dayOfWeek] };
   });
 
   return (
     <div className="mt-3 flex items-center gap-1.5">
       {days.map(({ dateStr, log, isToday, label }) => {
-        let dotClass = "bg-border/40"; // pending/future
+        let dotClass = "bg-border/40"; 
         if (log?.status === "done") dotClass = "bg-emerald-500";
         if (log?.status === "skipped") dotClass = "bg-muted-foreground/30";
 
@@ -46,31 +45,10 @@ function WeeklyBar({ weekCompletions }: { weekCompletions: HabitCompletion[] }) 
 
 export function HabitCard({ habit, onStatusChange }: { habit: HabitWithTodayStatus; onStatusChange: (id: string, status: HabitWithTodayStatus["todayStatus"]) => void }) {
   const [isPending, startTransition] = useTransition();
-  const [swipeOffset, setSwipeOffset] = useState(0);
-  const touchStartRef = useRef<number | null>(null);
+  const controls = useAnimation();
 
   const isDone = habit.todayStatus === "done";
   const isSkipped = habit.todayStatus === "skipped";
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartRef.current = e.touches[0].clientX;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStartRef.current === null) return;
-    const diff = e.touches[0].clientX - touchStartRef.current;
-    if (diff > 0 && diff < 100 && !isDone && !isSkipped) {
-      setSwipeOffset(diff);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (swipeOffset > 60) {
-      handleStatusChange("skipped");
-    }
-    setSwipeOffset(0);
-    touchStartRef.current = null;
-  };
 
   const handleStatusChange = (newStatus: "done" | "skipped" | "pending") => {
     const today = format(new Date(), "yyyy-MM-dd");
@@ -80,29 +58,41 @@ export function HabitCard({ habit, onStatusChange }: { habit: HabitWithTodayStat
     });
   };
 
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const offset = info.offset.x;
+    const velocity = info.velocity.x;
+    
+    // If swiped right far enough or fast enough
+    if ((offset > 100 || velocity > 500) && !isDone && !isSkipped) {
+      handleStatusChange("skipped");
+    }
+    
+    // Snap back to original position with spring animation
+    controls.start({ x: 0, transition: { type: "spring", stiffness: 300, damping: 20 } });
+  };
+
   let bgClass = "bg-white/70 dark:bg-slate-900/50 border-white/60 dark:border-white/10";
   if (isDone) bgClass = "bg-emerald-500/10 border-emerald-500/30";
   if (isSkipped) bgClass = "bg-muted/50 border-transparent opacity-60";
 
-  // Count current streak from weekCompletions for display
   const doneCount = habit.weekCompletions.filter((c) => c.status === "done").length;
 
   return (
     <div className="relative overflow-hidden rounded-[20px]">
-      {/* Swipe background */}
-      <div
-        className="absolute inset-0 flex items-center bg-amber-500/20 px-5 text-amber-600 dark:text-amber-400 font-bold text-xs"
-        style={{ opacity: swipeOffset > 0 ? 1 : 0, transition: swipeOffset > 0 ? "none" : "opacity 0.2s" }}
-      >
+      {/* Swipe background indicating the action */}
+      <div className="absolute inset-0 flex items-center bg-amber-500/20 px-5 text-amber-600 dark:text-amber-400 font-bold text-xs">
         <span>Dilewati (Skip)</span>
       </div>
 
-      <div
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        style={{ transform: `translateX(${swipeOffset}px)`, transition: swipeOffset ? "none" : "transform 0.2s" }}
-        className={`relative border px-4 py-3 shadow-xs backdrop-blur-xl transition-all ${bgClass}`}
+      <motion.div
+        drag={isDone || isSkipped ? false : "x"}
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        onDragEnd={handleDragEnd}
+        animate={controls}
+        whileHover={!isDone && !isSkipped ? { scale: 1.02 } : {}}
+        whileTap={!isDone && !isSkipped ? { scale: 0.98 } : {}}
+        className={`relative border px-4 py-3 shadow-xs backdrop-blur-xl ${bgClass} touch-none`}
       >
         {/* Top row: emoji + title + action */}
         <div className="flex items-center gap-3">
@@ -146,7 +136,7 @@ export function HabitCard({ habit, onStatusChange }: { habit: HabitWithTodayStat
 
         {/* Weekly bar */}
         <WeeklyBar weekCompletions={habit.weekCompletions} />
-      </div>
+      </motion.div>
     </div>
   );
 }
